@@ -3,8 +3,12 @@ var express = require('express')
   , util = require('util')
   , TwitterStrategy = require('passport-twitter').Strategy;
 
-var TWITTER_CONSUMER_KEY = "--insert-twitter-consumer-key-here--";
-var TWITTER_CONSUMER_SECRET = "--insert-twitter-consumer-secret-here--";
+var cookieParser = require('cookie-parser');
+var bodyParser   = require('body-parser');
+var session      = require('express-session');
+
+var TWITTER_CONSUMER_KEY = "consomer-key-you-get-from-twitter";
+var TWITTER_CONSUMER_SECRET = "--sonsumer-secret-you-get-from-twitter";
 
 
 // Passport session setup.
@@ -30,7 +34,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new TwitterStrategy({
     consumerKey: TWITTER_CONSUMER_KEY,
     consumerSecret: TWITTER_CONSUMER_SECRET,
-    callbackURL: "http://127.0.0.1:3000/auth/twitter/callback"
+    callbackURL: "http://104.236.64.211:3000/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
     // asynchronous verification, for effect...
@@ -48,24 +52,21 @@ passport.use(new TwitterStrategy({
 
 
 
-var app = express.createServer();
+var app = express();
 
 // configure Express
-app.configure(function() {
-  app.set('views', __dirname + '/views');
+//  app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
-  app.use(express.logger());
-  app.use(express.cookieParser());
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(express.session({ secret: 'keyboard cat' }));
+  //app.use(express.logger());
+  app.use(bodyParser());
+  app.use(cookieParser()); // read cookies (needed for auth)
+  app.use(session({ secret: 'keyboard cat' }));
   // Initialize Passport!  Also use passport.session() middleware, to support
   // persistent login sessions (recommended).
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(app.router);
+  //app.use(app.router);
   app.use(express.static(__dirname + '/public'));
-});
 
 
 app.get('/', function(req, res){
